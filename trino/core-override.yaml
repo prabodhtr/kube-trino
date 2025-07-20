@@ -8,7 +8,7 @@ server:
     - "http-server.process-forwarded=true"
     - "web-ui.authentication.type=FIXED"
     - "web-ui.user=admin"
-  workers: 0
+  workers: 1
 
 coordinator:
   annotations:
@@ -19,13 +19,13 @@ coordinator:
     nodeScheduler:
       includeCoordinator: true
   autoscaling:
-    enabled: false
+    enabled: true
     maxReplicas: 2
     targetCPUUtilizationPercentage: 200
     targetMemoryUtilizationPercentage:
     behavior:
       scaleDown:
-        stabilizationWindowSeconds: 5
+        stabilizationWindowSeconds: 30
         policies:
         - type: Pods
           value: 1
@@ -71,14 +71,3 @@ catalogs:
     tpcds.splits-per-node=4
   jmx: |
     connector.name=memory
-#worker:
-#  resources:
-#    requests:
-#      cpu: 100m
-#      memory: 1000Mi
-
-#initContainers:
-#  worker:
-#      - name: wait-for-coordinator
-#        image: busybox:1.28
-#        command: ['sh', '-c', "until nslookup trino.default.svc.cluster.local; do echo \"waiting for myservice\"; sleep 2; done"]

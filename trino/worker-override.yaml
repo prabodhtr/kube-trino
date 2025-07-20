@@ -1,0 +1,23 @@
+service:
+  port: 8090
+
+clusterGroup: resil
+
+server:
+  workers: 1
+
+catalogs:
+  tpch: |
+    connector.name=tpch
+    tpch.splits-per-node=4
+  tpcds: |
+    connector.name=tpcds
+    tpcds.splits-per-node=4
+  jmx: |
+    connector.name=memory
+
+worker:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 1Gi

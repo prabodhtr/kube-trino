@@ -12,41 +12,41 @@ volumeMounts:
     mountPath: "/app/operator.py"
     subPath: "operator.py"
     readOnly: true
-  - name: trino-override
-    mountPath: "/app/trino-override.yaml"
-    subPath: "trino-override.yaml"
+  - name: worker-value-override
+    mountPath: "/app/worker-override.yaml"
+    subPath: "worker-override.yaml"
     readOnly: true
-  - name: post-construct
-    mountPath: "/post-construct"
+  - name: worker-helm-dir
+    mountPath: "/worker-helm-dir"
 
 volumes:
   - name: main
     configMap:
       name: kopf-operator-code
-  - name: trino-override
+  - name: worker-value-override
     configMap:
-      name: trino-override
-  - name: post-construct-chart
+      name: worker-value-override
+  - name: worker-helm-chart
     configMap:
-      name: post-construct-chart
-  - name: post-construct-templates
+      name: worker-helm-chart
+  - name: worker-helm-template
     configMap:
-      name: post-construct-templates
-  - name: post-construct
+      name: worker-helm-template
+  - name: worker-helm-dir
     emptyDir: { }
 
 
 initContainers:
   - name: copy-config
     image: busybox
-    command: [ "/bin/sh", "-c", "cp -r /chart /post-construct && cp -r /templates /post-construct/chart" ]
+    command: [ "/bin/sh", "-c", "cp -r /chart /worker-helm-dir && cp -r /templates /worker-helm-dir/chart" ]
     volumeMounts:
-      - name: post-construct-templates
+      - name: worker-helm-template
         mountPath: "/templates"
-      - name: post-construct-chart
+      - name: worker-helm-chart
         mountPath: "/chart"
-      - name: post-construct
-        mountPath: "/post-construct"
+      - name: worker-helm-dir
+        mountPath: "/worker-helm-dir"
 
 command:
   - "kopf"

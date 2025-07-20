@@ -93,8 +93,8 @@ def install_cluster_components(spec, meta, namespace, **kwargs):
     # create service coordinator, deployment worker, service worker and worker autoscaler with clusterInstance value set
     helm_cmd = [
         "helm", "install", f"{cluster_instance}",
-        "--values", "/app/trino-override.yaml",
-        "/post-construct/chart",
+        "--values", "/app/worker-override.yaml",
+        "/worker-helm-dir/chart",
         "--namespace", "default",
         "--set", f"clusterInstance={cluster_instance}",
         "--set", f"coordinator.host={cluster_instance}-coordinator"

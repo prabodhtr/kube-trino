@@ -5,7 +5,7 @@
     - `kind get clusters`
 3. Add `trino`, and `metrics-server` helm charts onto helm repo
     - `helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/`
-    - `helm repo add tirno https://trinodb.github.io/charts`
+    - `helm repo add trino https://trinodb.github.io/charts`
     - `helm repo list`
     - `helm search repo` -- get all helm charts available
    
