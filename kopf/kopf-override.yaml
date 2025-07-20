@@ -1,0 +1,54 @@
+image:
+  repository: kopf
+  tag: latest
+  pullPolicy: Never
+
+config:
+  serverConfig:
+    http-server.http.port: 8081
+
+volumeMounts:
+  - name: main
+    mountPath: "/app/operator.py"
+    subPath: "operator.py"
+    readOnly: true
+  - name: trino-override
+    mountPath: "/app/trino-override.yaml"
+    subPath: "trino-override.yaml"
+    readOnly: true
+  - name: post-construct
+    mountPath: "/post-construct"
+
+volumes:
+  - name: main
+    configMap:
+      name: kopf-operator-code
+  - name: trino-override
+    configMap:
+      name: trino-override
+  - name: post-construct-chart
+    configMap:
+      name: post-construct-chart
+  - name: post-construct-templates
+    configMap:
+      name: post-construct-templates
+  - name: post-construct
+    emptyDir: { }
+
+
+initContainers:
+  - name: copy-config
+    image: busybox
+    command: [ "/bin/sh", "-c", "cp -r /chart /post-construct && cp -r /templates /post-construct/chart" ]
+    volumeMounts:
+      - name: post-construct-templates
+        mountPath: "/templates"
+      - name: post-construct-chart
+        mountPath: "/chart"
+      - name: post-construct
+        mountPath: "/post-construct"
+
+command:
+  - "kopf"
+  - "run"
+  - "/app/operator.py"

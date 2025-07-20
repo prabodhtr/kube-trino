@@ -1,0 +1,84 @@
+service:
+  port: 8090
+
+clusterGroup: resil
+
+server:
+  coordinatorExtraConfig:
+    - "http-server.process-forwarded=true"
+    - "web-ui.authentication.type=FIXED"
+    - "web-ui.user=admin"
+  workers: 0
+
+coordinator:
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /metrics
+    prometheus.io/port: "5556"
+  config:
+    nodeScheduler:
+      includeCoordinator: true
+  autoscaling:
+    enabled: false
+    maxReplicas: 2
+    targetCPUUtilizationPercentage: 200
+    targetMemoryUtilizationPercentage:
+    behavior:
+      scaleDown:
+        stabilizationWindowSeconds: 5
+        policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60
+      scaleUp:
+        stabilizationWindowSeconds: 0
+        policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60
+        selectPolicy: Max
+  resources:
+    requests:
+      cpu: 100m
+      memory: 1Gi
+
+
+jmx:
+  enabled: true
+  registryPort: 9080
+  exporter:
+    enabled: true
+    configProperties: |-
+       hostPort: localhost:9080
+       startDelaySeconds: 60
+       ssl: false
+       autoExcludeObjectNameAttributes: true
+       excludeObjectNameAttributes:
+         "java.lang:type=OperatingSystem":
+           - "ObjectName"
+         "java.lang:type=Runtime":
+           - "ClassPath"
+           - "SystemProperties"
+       rules:
+         - pattern: ".*"
+
+catalogs:
+  tpch: |
+    connector.name=tpch
+    tpch.splits-per-node=4
+  tpcds: |
+    connector.name=tpcds
+    tpcds.splits-per-node=4
+  jmx: |
+    connector.name=memory
+#worker:
+#  resources:
+#    requests:
+#      cpu: 100m
+#      memory: 1000Mi
+
+#initContainers:
+#  worker:
+#      - name: wait-for-coordinator
+#        image: busybox:1.28
+#        command: ['sh', '-c', "until nslookup trino.default.svc.cluster.local; do echo \"waiting for myservice\"; sleep 2; done"]

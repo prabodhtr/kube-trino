@@ -1,0 +1,6 @@
+name: "route_to_resil"
+description: "Rule to route traffic to active instance of resil cluster"
+condition: "request.getHeader(\"X-Trino-Client-Tags\") contains \"cg:resil\""
+priority: "1"
+actions:
+  - "result.put(\"routingGroup\", \"resil-1\")"

@@ -1,0 +1,9 @@
+include:
+  - db-compose.yaml
+
+# Kind creates a Docker network named 'kind' by default
+networks:
+  kind:
+    external: true
+
+ 

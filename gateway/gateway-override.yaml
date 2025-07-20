@@ -1,0 +1,39 @@
+config:
+
+  dataStore:
+    jdbcUrl: jdbc:postgresql://postgresDB:5432/gateway
+    user: tguser
+    password: somepwd
+    driver: org.postgresql.Driver
+
+  routingRules:
+    rulesType: FILE
+    rulesConfigPath: "/config/routing-rules.yml"
+    rulesEngineEnabled: true
+  requestAnalyzerConfig:
+    analyzeRequest: true
+
+volumes:
+  - name: routing-rules-config
+    configMap:
+      name: routing-rules-config
+  - name: config-rw
+    emptyDir: {}
+
+volumeMounts:
+  - name: config-rw
+    mountPath: "/config"
+
+
+initContainers:
+  - name: copy-config
+    image: busybox
+    command: [ "/bin/sh", "-c", "cp /etc/routing-rules/routing-rules.yml /config/" ]
+    volumeMounts:
+      - name: routing-rules-config
+        mountPath: "/etc/routing-rules"
+      - name: config-rw
+        mountPath: "/config"
+
+podSecurityContext:
+  runAsUser: 0
